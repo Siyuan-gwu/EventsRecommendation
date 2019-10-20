@@ -2,6 +2,7 @@ package rpc;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import db.DBConnection;
 import db.DBConnectionFactory;
@@ -40,13 +42,14 @@ public class SearchItem extends HttpServlet {
 		// TODO Auto-generated method stub
 		
 //		allow access only if session exists
-//		HttpSession session = request.getSession(false);
-//		if (session == null) {
-//			response.setStatus(403);
-//			return;
-//		}
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			response.setStatus(403);
+			return;
+		}
 		
 		response.setContentType("application/json");
+		String userId = session.getAttribute("user_id").toString();
 //		Get latitude and longitude from the url
 		double lat = Double.parseDouble(request.getParameter("lat"));
 		double lon = Double.parseDouble(request.getParameter("lon"));
@@ -56,9 +59,13 @@ public class SearchItem extends HttpServlet {
 		DBConnection connection = DBConnectionFactory.getConnection();
 		try {
 			List<Item> items = connection.searchItems(lat, lon, term);
+			//get the favorite items by this user
+			Set<String> favoriteItemIds = connection.getFavoriteItemIds(userId);
 			JSONArray array = new JSONArray();
 			for (Item item : items) {
-				array.put(item.toJSONObject());
+				JSONObject obj = item.toJSONObject();
+				obj.put("favorite", favoriteItemIds.contains(item.getItemId()));
+				array.put(obj);
 			}
 			RpcHelper.writeJsonArray(response, array);
 		} catch (Exception e) {

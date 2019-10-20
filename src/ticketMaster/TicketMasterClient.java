@@ -76,7 +76,7 @@ public class TicketMasterClient {
 			JSONObject obj = new JSONObject(response.toString());
 			if (!obj.isNull("_embedded")) {
 				JSONObject embedded = obj.getJSONObject("_embedded");
-				return getItemList(embedded.getJSONArray(keyword));
+				return getItemList(embedded.getJSONArray("events"));
 			}
 
 		} catch (JSONException e) {
@@ -201,7 +201,7 @@ public class TicketMasterClient {
 	 */
 //	public static void main(String[] args) {
 //		TicketMasterClient client = new TicketMasterClient();
-//		List<Item> events = client.search(37.38, -122.08, null);
+//		List<Item> events = client.search(37.38, -122.08, "Music");
 //		
 //		for (Item event : events) {
 //			System.out.println(event.toJSONObject());

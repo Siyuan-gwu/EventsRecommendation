@@ -285,4 +285,28 @@ public class MySQLConnection implements DBConnection {
 		return false;
 	}
 
+	@Override
+	public boolean registerUser(String userId, String password, String firstname, String lastname) {
+		// TODO Auto-generated method stub
+		
+		if (conn == null) {
+			System.out.println("DB connection failed");
+		}
+		
+		try {
+			String sql = "INSERT IGNORE INTO users VALUES(?,?,?,?)";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, userId);
+			ps.setString(2, password);
+			ps.setString(3, firstname);
+			ps.setString(4, lastname);
+			
+			return ps.executeUpdate() == 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
 }
